@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>New Item</h1>
+
+<form method='POST' action='/create_author'>
+    <legend>Add Item</legend>
+    {% for element in form %}
+      {{ element.label }}
+      {{ element }}
+      <ul>
+        {% for error in element.errors %}
+          <li class="error">{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+</form>
+
+
+{% endblock %}
