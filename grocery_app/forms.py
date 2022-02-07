@@ -10,7 +10,6 @@ class GroceryStoreForm(FlaskForm):
     address = StringField('Store Address')
     submit = SubmitField('Submit')
 
-    pass
 
 class GroceryItemForm(FlaskForm):
     """Form for adding/updating a GroceryItem."""
@@ -23,4 +22,4 @@ class GroceryItemForm(FlaskForm):
     photo_url = StringField('Photo URL')
     store = QuerySelectField('Store', query_factory=lambda: GroceryStore.query)
     submit = SubmitField('Submit')
-    pass
+

@@ -20,7 +20,7 @@
 
 <h2>Edit Store</h2>
 
-<form method='POST' action='/create_author'>
+<form method='POST' action='/store/{{store.id}}'>
     <legend>Enter information below:</legend>
     {% for element in form %}
       {{ element.label }}

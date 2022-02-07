@@ -14,7 +14,7 @@
 
 <h2>Edit Item</h2>
 
-<form method='POST' action='/create_author'>
+<form method='POST' action='/item/{{item.id}}'>
     <legend>Enter information below:</legend>
     {% for element in form %}
       {{ element.label }}
