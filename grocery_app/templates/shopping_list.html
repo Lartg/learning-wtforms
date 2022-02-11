@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for item in user.shopping_list_items %}
+  <ul>
+    <li>
+      { item.name }
+    </li>
+  </ul>
+
+{% endblock %}

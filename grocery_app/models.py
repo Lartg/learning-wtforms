@@ -33,8 +33,24 @@ class GroceryItem(db.Model):
     store = db.relationship('GroceryStore', back_populates='items')
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_by = db.relationship('User')
+    shopping_list_items = db.relationship(
+         'User',
+        secondary='shopping_list',
+        back_populates='user_shopping_list_items'
+    )
+
 
 class User(db.model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), nullable=False)
     password = db.Column(db.String(80), nullable=False)
+    shopping_list_items = db.relationship(
+        'GroceryItem',
+        secondary='shopping_list',
+        back_populates='groceryitem_shopping_list_items'
+    )
+
+shopping_list_table = db.Table('shopping_list',
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+    )
