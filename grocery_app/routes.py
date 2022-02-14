@@ -4,10 +4,19 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash
 from datetime import date, datetime
 from grocery_app.models import GroceryStore, GroceryItem, User
 from grocery_app.forms import GroceryStoreForm, GroceryItemForm, SignUpForm, LoginForm
-from flask_login import login_user, logout_user, current_user, login_required
-from flask_bcrypt import bcrypt
-# Import app and db from events_app package so that we can run app
-from grocery_app.extensions import app, db
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
+from flask_bcrypt import generate_password_hash, check_password_hash
+
+# from flask.ext.bcrypt import Bcrypt 
+
+from grocery_app.extensions import app, db, flask_bcrypt
+
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 main = Blueprint("main", __name__)
 
@@ -21,7 +30,8 @@ def signup():
     print('in signup')
     form = SignUpForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        
+        hashed_password = generate_password_hash(form.password.data).decode('utf-8')
         user = User(
             username=form.username.data,
             password=hashed_password
@@ -40,9 +50,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        login_user(user, remember=True)
-        next_page = request.args.get('next')
-        return redirect(next_page if next_page else url_for('main.homepage'))
+        if flask_bcrypt.check_password_hash(user.password, form.password.data): 
+            login_user(user, remember=True)
+            next_page = request.args.get('next')
+            return redirect(next_page if next_page else url_for('main.homepage'))
     return render_template('login.html', form=form)
 
 @auth.route('/logout')
@@ -58,7 +69,6 @@ def logout():
 @main.route('/')
 def homepage():
     all_stores = GroceryStore.query.all()
-    print(all_stores)
     return render_template('home.html', all_stores=all_stores)
 
 @main.route('/new_store', methods=['GET', 'POST'])
@@ -69,7 +79,7 @@ def new_store():
         new_store = GroceryStore(
             title = form.title.data,
             address = form.address.data,
-            created_by = current_user
+            created_by_id = current_user.id
         )
         db.session.add(new_store)
         db.session.commit()
@@ -88,7 +98,7 @@ def new_item():
             category = form.category.data,
             photo_url = form.photo_url.data,
             store = form.store.data,
-            created_by = current_user
+            created_by_id = current_user.id
         )
         db.session.add(new_grocery_item)
         db.session.commit()
@@ -128,6 +138,8 @@ def item_detail(item_id):
         return redirect(f'/item/{item_id}')
     if request.method == 'POST':
         current_user.shopping_list_items.append(item_id)
+        db.session.add(current_user)
+        db.session.commit()
         return
     return render_template('item_detail.html', item=item, form=form)
 
@@ -135,4 +147,3 @@ def item_detail(item_id):
 @login_required
 def shopping_list():
     return render_template('shopping_list.html', user=current_user)
-    pass

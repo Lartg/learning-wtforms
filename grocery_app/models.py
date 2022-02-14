@@ -1,7 +1,7 @@
 from sqlalchemy_utils import URLType
 
-from grocery_app.extensions import db
-from grocery_app.utils import FormEnum
+from .extensions import db
+from .utils import FormEnum
 
 class ItemCategory(FormEnum):
     """Categories of grocery items."""
@@ -19,7 +19,7 @@ class GroceryStore(db.Model):
     address = db.Column(db.String(200), nullable=False)
     items = db.relationship('GroceryItem', back_populates='store')
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_by = db.relationship('User')
+   
 
 class GroceryItem(db.Model):
     """Grocery Item model."""
@@ -32,25 +32,24 @@ class GroceryItem(db.Model):
         db.Integer, db.ForeignKey('grocery_store.id'), nullable=False)
     store = db.relationship('GroceryStore', back_populates='items')
     created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_by = db.relationship('User')
     shopping_list_items = db.relationship(
-         'User',
+        'User',
         secondary='shopping_list',
-        back_populates='user_shopping_list_items'
+        back_populates='shopping_list_items'
     )
 
 
-class User(db.model):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), nullable=False)
     password = db.Column(db.String(80), nullable=False)
     shopping_list_items = db.relationship(
         'GroceryItem',
         secondary='shopping_list',
-        back_populates='groceryitem_shopping_list_items'
+        back_populates='shopping_list_items'
     )
 
 shopping_list_table = db.Table('shopping_list',
-    db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
+    db.Column('item_id', db.Integer, db.ForeignKey('grocery_item.id')),
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
     )
