@@ -42,7 +42,7 @@ class GroceryItem(db.Model):
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), nullable=False)
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(), nullable=False)
     shopping_list_items = db.relationship(
         'GroceryItem',
         secondary='shopping_list',
