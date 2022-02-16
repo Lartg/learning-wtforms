@@ -1,5 +1,5 @@
 from sqlalchemy_utils import URLType
-
+from flask_login import UserMixin
 from .extensions import db
 from .utils import FormEnum
 
@@ -39,7 +39,7 @@ class GroceryItem(db.Model):
     )
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(16), nullable=False)
     password = db.Column(db.String(), nullable=False)
